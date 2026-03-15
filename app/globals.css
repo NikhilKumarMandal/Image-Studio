@@ -1,0 +1,276 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Tokens ── */
+:root {
+  --bg-base:       #141414;
+  --bg-surface:    #1c1c1c;
+  --bg-elevated:   #242424;
+  --bg-hover:      #2c2c2c;
+  --border:        #2e2e2e;
+  --border-strong: #3a3a3a;
+  --text-primary:  #f0f0f0;
+  --text-secondary:#888888;
+  --text-muted:    #555555;
+  --accent:        #3b82f6;
+  --accent-dim:    rgba(59,130,246,0.12);
+  --accent-glow:   rgba(59,130,246,0.25);
+  --danger:        #ef4444;
+  --success:       #22c55e;
+  --left-w:  252px;
+  --right-w: 224px;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 14px; }
+body {
+  margin: 0; padding: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden; /* default: no body scroll on desktop */
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+/* ── Form elements ── */
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  height: 3px; border-radius: 2px;
+  background: var(--border-strong);
+  outline: none; cursor: pointer; width: 100%; display: block;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%; background: var(--accent);
+  cursor: pointer; transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+input[type="range"]:focus { outline: none; }
+
+textarea,
+input[type="text"],
+input[type="number"] {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 0; /* prevent flex overflow */
+}
+textarea:focus,
+input[type="text"]:focus,
+input[type="number"]:focus { border-color: var(--accent); }
+
+/* Hide number spinners */
+input[type="number"] { -moz-appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+select {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  outline: none;
+}
+button { font-family: 'DM Sans', sans-serif; }
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50%       { box-shadow: 0 0 10px 3px rgba(59,130,246,0.12); }
+}
+.animate-fadein { animation: fadeIn 0.2s ease both; }
+.btn-export     { animation: pulseGlow 3s ease infinite; }
+
+/* ══════════════════════════════════════════════
+   LAYOUT — desktop first
+══════════════════════════════════════════════ */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Topbar ── */
+.topbar {
+  height: 48px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  flex-shrink: 0;
+  z-index: 50;
+  gap: 8px;
+}
+
+/* ── Editor row ── */
+.editor-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Left panel ── */
+.panel-left {
+  width: var(--left-w);
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* children handle their own scroll */
+  min-width: 0;
+}
+
+/* ── Right panel ── */
+.panel-right {
+  width: var(--right-w);
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ── Canvas center ── */
+.canvas-center {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+══════════════════════════════════════════════ */
+
+/* 1280px — slightly narrower panels */
+@media (max-width: 1280px) {
+  :root { --left-w: 236px; --right-w: 210px; }
+}
+
+/* 1100px — hide right panel */
+@media (max-width: 1100px) {
+  :root { --left-w: 228px; }
+  .panel-right { display: none; }
+}
+
+/* 860px — narrower left */
+@media (max-width: 860px) {
+  :root { --left-w: 210px; }
+}
+
+/* 680px — MOBILE: stack vertically */
+@media (max-width: 680px) {
+  body { overflow-y: auto; } /* allow body scroll on mobile */
+
+  .app-shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .editor-layout {
+    flex-direction: column;
+    flex: none;
+    height: auto;
+    overflow: visible;
+  }
+
+  .panel-left {
+    width: 100%;
+    max-height: 45vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .canvas-center {
+    height: 60vw;
+    min-height: 220px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .panel-right {
+    display: flex; /* show below canvas on mobile */
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+}
+
+/* 420px — small phones */
+@media (max-width: 420px) {
+  html { font-size: 13px; }
+  .topbar { padding: 0 10px; gap: 6px; }
+  .canvas-center { height: 65vw; }
+  .panel-left { max-height: 42vh; }
+}
+
+/* ── Touch-friendly on mobile ── */
+@media (max-width: 680px) {
+  button { min-height: 38px; }
+
+  input[type="range"] { height: 5px; }
+  input[type="range"]::-webkit-slider-thumb { width: 18px; height: 18px; }
+
+  /* Bigger tap targets for small buttons */
+  .side-panel button { min-height: 34px; }
+}
+
+/* ── Topbar: hide labels at small sizes ── */
+@media (max-width: 560px) {
+  .topbar-title { display: none; }
+  .topbar-badge { display: none; }
+  .topbar-dims  { display: none; }
+  .topbar-sep   { display: none; }
+  .label-reset  { display: none; }
+}
+
+/* ── Prevent content overflow in panels ── */
+.panel-left  *,
+.panel-right * {
+  max-width: 100%;
+}
+
+/* Make sure textareas and inputs never overflow panels */
+.panel-left textarea,
+.panel-left input[type="text"],
+.panel-left input[type="number"],
+.panel-right textarea,
+.panel-right input[type="text"],
+.panel-right input[type="number"] {
+  max-width: 100%;
+  width: 100%;
+}
