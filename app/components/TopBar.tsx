@@ -1,14 +1,23 @@
 'use client';
-import { Camera, Download, RotateCcw, Undo2, Redo2 } from 'lucide-react';
+import { Camera, Download, RotateCcw, Undo2, Redo2, Copy, Check } from 'lucide-react';
 import { AppState } from '../types';
-import Image from 'next/image';
+import { useState } from 'react';
 
 interface Props {
   state: AppState; canUndo: boolean; canRedo: boolean;
   onReset: () => void; onExport: () => void; onUndo: () => void; onRedo: () => void;
+  onCopy: () => Promise<void>;
 }
 
-export default function TopBar({ state, canUndo, canRedo, onReset, onExport, onUndo, onRedo }: Props) {
+export default function TopBar({ state, canUndo, canRedo, onReset, onExport, onUndo, onRedo, onCopy }: Props) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await onCopy();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const iconBtn = (active: boolean): React.CSSProperties => ({
     display:'flex', alignItems:'center', gap:4, padding:'5px 8px',
     borderRadius:6, border:'1px solid var(--border)', background:'transparent',
@@ -50,6 +59,23 @@ export default function TopBar({ state, canUndo, canRedo, onReset, onExport, onU
           <span className="label-reset">Reset</span>
         </button>
 
+        {/* Copy PNG */}
+        <button
+          onClick={handleCopy}
+          title="Copy to clipboard"
+          style={{
+            display:'flex', alignItems:'center', gap:5, padding:'6px 14px',
+            borderRadius:7, border:'1px solid var(--border)', background: copied ? '#16a34a' : 'transparent',
+            color: copied ? '#fff' : 'var(--text-secondary)', fontSize:12, fontWeight:700,
+            cursor:'pointer', fontFamily:'DM Sans,sans-serif', whiteSpace:'nowrap',
+            minHeight:32, flexShrink:0, transition:'all 0.2s',
+          }}
+        >
+          {copied ? <Check size={13} /> : <Copy size={13} />}
+          <span>{copied ? 'Copied!' : 'Copy PNG'}</span>
+        </button>
+
+        {/* Export PNG */}
         <button onClick={onExport} className="btn-export"
           style={{ display:'flex', alignItems:'center', gap:5, padding:'6px 14px', borderRadius:7, border:'none', background:'linear-gradient(135deg,#3b82f6,#60a5fa)', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer', fontFamily:'DM Sans,sans-serif', whiteSpace:'nowrap', minHeight:32, flexShrink:0 }}>
           <Download size={13} />

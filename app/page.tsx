@@ -28,6 +28,23 @@ export default function Home() {
     });
   }, [state]);
 
+  const handleCopy = async () => {
+  const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+  if (!canvas) return;
+  await new Promise<void>((resolve, reject) => {
+    canvas.toBlob(async (blob) => {
+      if (!blob) return reject();
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        resolve();
+      } catch (err) {
+        console.error('Copy failed:', err);
+        reject(err);
+      }
+    }, 'image/png');
+  });
+};
+
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       const ctrl = e.ctrlKey || e.metaKey;
@@ -43,7 +60,7 @@ export default function Home() {
     <div className="app-shell">
       <TopBar
         state={state} canUndo={canUndo} canRedo={canRedo}
-        onReset={onReset} onExport={onExport} onUndo={undo} onRedo={redo}
+        onReset={onReset} onExport={onExport} onUndo={undo} onRedo={redo} onCopy={handleCopy}
       />
       <div className="editor-layout">
         <div className="panel-left">
